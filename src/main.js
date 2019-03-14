@@ -19,7 +19,11 @@ Vue.prototype.$axios = axios
 
 Vue.config.productionTip = false
 Vue.use(BootstrapVue)
-Vue.use(VueToastr)
+Vue.use(VueToastr, {
+  defaultPosition: 'toast-top-right',
+  defaultType: 'info',
+  defaultTimeout: 1000
+})
 Vue.use(VueSweetalert2)
 
 new Vue({

@@ -7,15 +7,15 @@
                     <br>
                     <div class="row">
                         <div class="col-md-6">
-                            <select v-model="selectedStatus">
-                                <option disabled value="">Please select one</option>
+                            <select v-model="filter" @change="getTodo()">
+                                <option value="">Please select one</option>
                                 <option v-for="item in status" :value=" item.id ">{{ item.name }}</option>
                             </select>
                         </div>
                         <div class="col-md-6">
                             <b-nav-form class="float-right">
-                                <b-form-input size="sm" class="mr-sm-2" type="text" placeholder="Search"/>
-                                <b-button size="sm" class="my-2 my-sm-0" type="submit">Search</b-button>
+                                <b-form-input size="sm" class="mr-sm-2" type="text" placeholder="Search" v-model="keyword"/>
+                                <b-button size="sm" class="my-2 my-sm-0" @click="getTodo()">Search</b-button>
                             </b-nav-form>
                         </div>
                     </div>
@@ -27,7 +27,7 @@
                                 ID
                             </th>
                             <th>
-                                name
+                                Title
                             </th>
                             <th>
                                 Description
@@ -56,7 +56,7 @@
                         </tbody>
                     </table>
                     <hr>
-                    <template>
+                    <template v-if="todo !== ''">
                         <form action="" method="POST">
                             <div class="form-group">
                                 <label for="title">Title</label>
@@ -72,9 +72,10 @@
                                     <option v-for="item in status" :value="item.id">{{ item.name }}</option>
                                 </select>
                             </div>
-                            <button @click=""></button>
+                            <button @click="updateTodo" class="btn btn-primary">Save</button>
                         </form>
                     </template>
+                    <template v-else></template>
                 </div>
             </div>
         </b-container>
@@ -89,7 +90,9 @@
                 selectedStatus: '',
                 status: [],
                 todos: [],
-                todo: ''
+                todo: '',
+                keyword: '',
+                filter: ''
             }
         },
         methods: {
@@ -101,7 +104,10 @@
                 })
             },
             getTodo() {
-                this.$axios.get('http://localhost:8000/api/getshow').then((response) => {
+                this.$axios.post('http://localhost:8000/api/getshow', {
+                        keyword: this.keyword,
+                        filter: this.filter
+                    }).then((response) => {
                     if (response.data.code === 200) {
                         this.todos = response.data.data
                     }
@@ -117,7 +123,18 @@
             },
             deleteTodo() {
 
+            },
+            updateTodo(e){
+                e.preventDefault()
+                this.$axios.defaults.headers.common['Content-Type'] = 'X-Requested-With'
+                this.$axios.post('http://localhost:8000/api/store', this.todo).then((response) => {
+                    console.log(response)
+                    this.$toastr(response.data.message, " Todo update success")
+                    this.todo = ''
+                    this.getTodo()
+                })
             }
+
         },
         mounted() {
             this.getStatus()

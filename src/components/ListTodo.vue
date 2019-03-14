@@ -20,7 +20,7 @@
                         </div>
                     </div>
                     <hr>
-                    <table width="100%" border="1">
+                    <table class="table table-bordered table-hover table-striped">
                         <thead>
                         <tr>
                             <th>
@@ -42,17 +42,23 @@
                         </thead>
 
                         <tbody>
-                        <tr v-for="todo in todos">
-                            <td>{{ todo.id }}</td>
-                            <td>{{ todo.title }}</td>
-                            <td>{{ todo.description }}</td>
-                            <td>{{ todo.status.name}}</td>
-                            <td align="center">
-                                <b-button variant="primary" class="btn btn-sm" @click="editTodo(todo.id)">Edit
-                                </b-button>
-                                <b-button variant="danger" class="btn btn-sm" @click="deleteTodo(todo.id)">Delete</b-button>
-                            </td>
-                        </tr>
+                        <template v-if="todos.length > 0">
+                            <tr v-for="(todo, key) in todos">
+                                <td>{{ key+1 }}</td>
+                                <td>{{ todo.title }}</td>
+                                <td>{{ todo.description }}</td>
+                                <td>{{ todo.status.name}}</td>
+                                <td align="center">
+                                    <b-button variant="primary" style="margin-right: 2px;" class="btn btn-sm" @click="editTodo(todo.id)">Edit
+                                    </b-button><b-button variant="danger" class="btn btn-sm" @click="deleteTodo(todo.id)">Delete</b-button>
+                                </td>
+                            </tr>
+                        </template>
+                        <template v-else>
+                            <tr>
+                                <td colspan="5" class="text-center">No records.</td>
+                            </tr>
+                        </template>
                         </tbody>
                     </table>
                     <hr>
@@ -64,7 +70,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="description">Description</label>
-                                <textarea class="form-control" rows="10" name="description" id="description" v-model="todo.description"></textarea>
+                                <textarea class="form-control"  name="description" id="description" v-model="todo.description"></textarea>
                             </div>
                             <div class="form-group">
                                 <select v-model="selectedStatus">
@@ -72,7 +78,6 @@
                                     <option v-for="item in status" :value="item.id">{{ item.name }}</option>
                                 </select>
                             </div>
-                            <button @click=""></button>
                         </form>
                     </template>
                 </div>
@@ -101,7 +106,7 @@
                 })
             },
             getTodo() {
-                this.$axios.get('http://localhost:8000/api/getshow').then((response) => {
+                this.$axios.post('http://localhost:8000/api/getshow').then((response) => {
                     if (response.data.code === 200) {
                         this.todos = response.data.data
                     }
@@ -116,12 +121,30 @@
                 })
             },
             deleteTodo(id) {
-                this.$axios.get('http://localhost:8000/api/delete/'+ id).then((response)=>{
-                    if(response.data.code === 200) {
-                        this.getTodo()
+                this.$swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    type: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.value === true) {
+                        this.$axios.get('http://localhost:8000/api/delete/'+ id).then((response)=>{
+                            if(response.data.code === 200) {
+                                this.getTodo()
+                                this.$swal.fire(
+                                    'Deleted!',
+                                    'Your file has been deleted.',
+                                    'success'
+                                )
+                            }
+                        })
                     }
                 })
-            }
+
+            },
         },
         mounted() {
             this.getStatus()

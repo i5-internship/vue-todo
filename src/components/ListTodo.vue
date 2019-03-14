@@ -50,7 +50,7 @@
                             <td align="center">
                                 <b-button variant="primary" class="btn btn-sm" @click="editTodo(todo.id)">Edit
                                 </b-button>
-                                <b-button variant="danger" class="btn btn-sm" @click="deleteTodo">Delete</b-button>
+                                <b-button variant="danger" class="btn btn-sm" @click="deleteTodo(todo.id)">Delete</b-button>
                             </td>
                         </tr>
                         </tbody>
@@ -115,8 +115,12 @@
                     }
                 })
             },
-            deleteTodo() {
-
+            deleteTodo(id) {
+                this.$axios.get('http://localhost:8000/api/delete/'+ id).then((response)=>{
+                    if(response.data.code === 200) {
+                        this.getTodo()
+                    }
+                })
             }
         },
         mounted() {

@@ -37,7 +37,7 @@
                 this.$axios.get('http://127.0.0.1:8000/api/status')
                     .then((response) => {
                             this.statuses = response.data.data
-                        console.log(this.statuses)
+
                     })
             },
             sendData(){
@@ -45,8 +45,13 @@
                     title: this.title,
                     status_id: this.status,
                     description: this.description
-                })
 
+                })
+                    .then((response) => {
+                        if(response.data.code === 200) {
+                            this.$router.push({name: 'home'})
+                        }
+                    })
             }
 
         },

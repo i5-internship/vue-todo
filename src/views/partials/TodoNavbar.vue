@@ -3,7 +3,8 @@
         <b-navbar toggleable="lg" type="dark" variant="info">
             <b-container>
                 <b-navbar-brand >Todo list</b-navbar-brand>
-                <b-navbar-brand >New Todo</b-navbar-brand>
+
+                <b-navbar-brand ><router-link :to="{name:'create'}">Create New</router-link></b-navbar-brand>
 
                 <b-navbar-toggle target="nav_collapse"/>
 
